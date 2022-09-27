@@ -3,42 +3,48 @@
     #define Robo3Duino_h	
 
     Pose2D rotx( float angle ){
-		float arrayRot[3][3] = {{1,0,0},{0,cos(angle/ang2rad),-sin(angle/ang2rad)},{0,sin(angle/ang2rad),cos(angle/ang2rad)}};
+		float theta = angle/ang2rad;
+		float arrayRot[3][3] = {{1,0,0},{0,cos(theta),-sin(theta)},{0,sin(theta),cos(theta)}};
 		Pose2D m;
 		m = arrayRot;
 		return m;
 	}
 
 	Pose2D roty( float angle ){
-		float arrayRot[3][3] = {{cos(angle/ang2rad),0,sin(angle/ang2rad)},{0,1,0},{-sin(angle/ang2rad),0,cos(angle/ang2rad)}};
+		float theta = angle/ang2rad;
+		float arrayRot[3][3] = {{cos(theta),0,sin(theta)},{0,1,0},{-sin(theta),0,cos(theta)}};
 		Pose2D m;
 		m = arrayRot;
 		return m;
 	}
 
 	Pose2D rotz( float angle ){	
-		float arrayRot[3][3] = {{cos(angle/ang2rad),-sin(angle/ang2rad),0},{sin(angle/ang2rad),cos(angle/ang2rad),0},{0,0,1}};
+		float theta = angle/ang2rad;
+		float arrayRot[3][3] = {{cos(theta),-sin(theta),0},{sin(theta),cos(theta),0},{0,0,1}};
 		Pose2D m;
 		m = arrayRot;
 		return m;
 	}
 
 	Pose3D trotx( float angle ){
-		float arrayRot[4][4] = {{1,0,0,0},{0,cos(angle/ang2rad),-sin(angle/ang2rad),0},{0,sin(angle/ang2rad),cos(angle/ang2rad),0},{0,0,0,1}};
+		float theta = angle/ang2rad;
+		float arrayRot[4][4] = {{1,0,0,0},{0,cos(theta),-sin(theta),0},{0,sin(theta),cos(theta),0},{0,0,0,1}};
 		Pose3D m;
 		m = arrayRot;
 		return m;
 	}
 
 	Pose3D troty( float angle ){
-		float arrayRot[4][4] = {{cos(angle/ang2rad),0,sin(angle/ang2rad),0},{0,1,0,0},{-sin(angle/ang2rad),0,cos(angle/ang2rad),0},{0,0,0,1}};
+		float theta = angle/ang2rad;
+		float arrayRot[4][4] = {{cos(theta),0,sin(theta),0},{0,1,0,0},{-sin(theta),0,cos(theta),0},{0,0,0,1}};
 		Pose3D m;
 		m = arrayRot;
 		return m;
 	}
 
 	Pose3D trotz( float angle ){
-		float arrayRot[4][4] = {{cos(angle/ang2rad),-sin(angle/ang2rad),0,0},{sin(angle/ang2rad),cos(angle/ang2rad),0},{0,0,1,0},{0,0,0,1}};
+		float theta = angle/ang2rad;
+		float arrayRot[4][4] = {{cos(theta),-sin(theta),0,0},{sin(theta),cos(theta),0},{0,0,1,0},{0,0,0,1}};
 		Pose3D m;
 		m = arrayRot;
 		return m;
@@ -51,20 +57,43 @@
 		return m;
 	}
 
+	Pose3D transl( vector3D p ){
+		float arrayRot[4][4] = { {0,0,0,p(0)}, {0,0,0,p(1)}, {0,0,0,p(2)}, {0,0,0,1}};
+		Pose3D m;
+		m = arrayRot;
+		return m;
+	}
+
  	Pose2D rpy2r( float roll, float pitch, float yaw){
-		return rotx(roll)*roty(pitch)*rotz(yaw);
+		return rotz(yaw)*roty(pitch)*rotx(roll);
+	}
+
+	Pose2D rpy2r( vector3D angles ){
+		return rotz( angles(2) )*roty( angles(1) )*rotx( angles(0) );
+	}
+
+	Pose3D rpy2tr( float roll, float pitch, float yaw ){
+		return trotz(yaw)*troty(pitch)*trotx(roll);
+	}
+
+	Pose3D rpy2tr( vector3D angles ){
+		return trotz( angles(2) )*troty( angles(1) )*trotx( angles(0) );
 	}
 
 	Pose2D eul2r( float phi, float theta, float psi){
 		return rotz(phi)*roty(theta)*rotz(psi);
 	}
 
-	Pose3D rpy2tr( float roll, float pitch, float yaw){
-		return trotx(roll)*troty(pitch)*trotz(yaw);
+	Pose2D eul2r( vector3D angles ){
+		return rotz( angles(0) )*roty( angles(1) )*rotz( angles(2) );
 	}
 
 	Pose3D eul2tr( float phi, float theta, float psi){
 		return trotz(phi)*troty(theta)*trotz(psi);
+	}
+
+	Pose3D eul2tr( vector3D angles ){
+		return trotz( angles(0) )*troty( angles(1) )*trotz( angles(2) );
 	}
 
 	Pose3D se2(float px , float py, float pz , float roll, float pitch, float yaw ){
@@ -73,6 +102,17 @@
 		m.Submatrix<3, 3>( 0 ,0 ) = rot;
 		return m;
 	}
+
+	Pose3D se2( vector3D p, vector3D angles ){
+    	Pose2D rot = rpy2r(  angles(0) ,  angles(1) ,  angles(2) );
+		Pose3D m = transl( p(0), p(1), p(2) );
+		m.Submatrix<3, 3>( 0 ,0 ) = rot;
+		return m;
+	}
+
+	/*Pose3D tr2eul( Pose3D m ){
+		return trotz(phi)*troty(theta)*trotz(psi);
+	}*/
 
 	/*Pose3D rot2tr(float angle){
 		

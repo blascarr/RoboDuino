@@ -24,7 +24,7 @@ This library is part of a educational course to learn C++ in practice in https:/
     #define RoboDuino_h	
     #include "BasicLinearAlgebra.h"
 	#include <stdarg.h>
-
+	#include <Geometry.h>
     
 	#if defined(ARDUINO) && ARDUINO >= 100
 		#include "Arduino.h"
